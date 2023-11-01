@@ -19,6 +19,9 @@ Install as a library using:
 pip install git+https://github.com/korakoe/VALL-E-X.git
 ```
 
+You can train using the repo below (this repo is compatible):
+https://github.com/0417keito/VALL-E-X-Trainer-by-CustomData
+
 ## 📖 Quick Index
 * [🚀 Updates](#-updates)
 * [📢 Features](#-features)
