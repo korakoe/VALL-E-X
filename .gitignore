@@ -16,3 +16,4 @@ nltk_data/tokenizers/punkt/.DS_Store
 test.wav
 test1.wav
 *.pyc
+/dist/
