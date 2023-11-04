@@ -1,8 +1,20 @@
 from setuptools import find_packages, setup
+import os
+
+thisdir = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(thisdir, 'README.md'), encoding='utf-8') as fin:
+    readme_text = fin.read()
 
 setup(
     name="VALL-E-X",
     packages=find_packages(exclude=[]),
+    version="0.0.1",
+    long_description=readme_text,
+    long_description_content_type='text/markdown',
+    url='https://github.com/korakoe/VALL-E-X',
+    project_urls={
+        'Source': 'https://github.com/korakoe/VALL-E-X',
+    },
     description="An open source implementation of Microsoft's VALL-E X zero-shot TTS",
     author="Plachtaa",
     long_description_content_type="text/markdown",
