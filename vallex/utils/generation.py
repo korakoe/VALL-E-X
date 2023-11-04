@@ -6,12 +6,14 @@ import logging
 import requests
 import langid
 from tqdm import tqdm
+
 langid.set_languages(['en', 'zh', 'ja'])
 
 from vallex.utils.download import download_models_from_github
 
 import pathlib
 import platform
+
 if platform.system().lower() == 'windows':
     temp = pathlib.PosixPath
     pathlib.PosixPath = pathlib.WindowsPath
@@ -58,11 +60,14 @@ if not os.path.exists("./utils/g2p/bpe_69.json"):
                 f.write(chunk)
                 f.flush()
 
-
 text_tokenizer = PhonemeBpeTokenizer(tokenizer_path="./utils/g2p/bpe_69.json")
 text_collater = get_text_token_collater()
 
-def preload_models(map=None):
+
+def preload_models(download=True, map=None, checkpoint_path=None):
+    if download:
+        download_models_from_github()
+
     global device
     print("Loading models...")
 
@@ -82,7 +87,10 @@ def preload_models(map=None):
         prepend_bos=True,
         num_quantizers=NUM_QUANTIZERS,
     ).to(device)
-    checkpoint = torch.load(os.path.join(checkpoints_dir, model_checkpoint_name), map_location='cpu')
+    if not checkpoint_path:
+        checkpoint = torch.load(os.path.join(checkpoints_dir, model_checkpoint_name), map_location='cpu')
+    else:
+        checkpoint = torch.load(checkpoint_path, map_location='cpu')
     missing_keys, unexpected_keys = model.load_state_dict(
         checkpoint["model"], strict=True
     )
@@ -96,9 +104,9 @@ def preload_models(map=None):
 
     return model, codec, vocos
 
+
 @torch.no_grad()
 def generate_audio(model, codec, vocos, text, prompt=None, language='auto', accent='no-accent'):
-
     text = text.replace("\n", "").strip(" ")
     # detect language
     if language == "auto":
@@ -153,11 +161,12 @@ def generate_audio(model, codec, vocos, text, prompt=None, language='auto', acce
         text_language=langs if accent == "no-accent" else lang,
     )
     # Decode with Vocos
-    frames = encoded_frames.permute(2,0,1)
+    frames = encoded_frames.permute(2, 0, 1)
     features = vocos.codes_to_features(frames)
     samples = vocos.decode(features, bandwidth_id=torch.tensor([2], device=device))
 
     return samples.squeeze().cpu().numpy()
+
 
 @torch.no_grad()
 def generate_audio_from_long_text(text, prompt=None, language='auto', accent='no-accent', mode='sliding-window'):
@@ -230,7 +239,7 @@ def generate_audio_from_long_text(text, prompt=None, language='auto', accent='no
             )
             complete_tokens = torch.cat([complete_tokens, encoded_frames.transpose(2, 1)], dim=-1)
         # Decode with Vocos
-        frames = complete_tokens.permute(1,0,2)
+        frames = complete_tokens.permute(1, 0, 2)
         features = vocos.codes_to_features(frames)
         samples = vocos.decode(features, bandwidth_id=torch.tensor([2], device=device))
         return samples.squeeze().cpu().numpy()
@@ -276,7 +285,7 @@ def generate_audio_from_long_text(text, prompt=None, language='auto', accent='no
                 audio_prompts = original_audio_prompts
                 text_prompts = original_text_prompts
         # Decode with Vocos
-        frames = complete_tokens.permute(1,0,2)
+        frames = complete_tokens.permute(1, 0, 2)
         features = vocos.codes_to_features(frames)
         samples = vocos.decode(features, bandwidth_id=torch.tensor([2], device=device))
         return samples.squeeze().cpu().numpy()

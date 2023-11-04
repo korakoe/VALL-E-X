@@ -8,7 +8,7 @@ with open(os.path.join(thisdir, 'README.md'), encoding='utf-8') as fin:
 setup(
     name="VALL-E-X",
     packages=find_packages(exclude=[]),
-    version="0.0.1a1",
+    version="0.0.2a1",
     long_description=readme_text,
     license='MIT',
     long_description_content_type='text/markdown',
