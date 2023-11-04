@@ -17,6 +17,10 @@ More details about the model are presented in [model card](./model-card.md).
 Install as a library using:
 ```sh
 pip install git+https://github.com/korakoe/VALL-E-X.git
+
+OR
+
+pip install VALL-E-X
 ```
 
 You can train using the repo below (this repo is compatible | View the source for preload_models for info on loading custom models):
