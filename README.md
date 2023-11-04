@@ -21,6 +21,14 @@ pip install git+https://github.com/korakoe/VALL-E-X.git
 
 You can train using the repo below (this repo is compatible | View the source for preload_models for info on loading custom models):
 https://github.com/0417keito/VALL-E-X-Trainer-by-CustomData
+<br>
+<br>
+OR
+<br>
+<br>
+Use my training Colab!
+<br>
+<a href="https://colab.research.google.com/github/korakoe/VALL-E-X/blob/main/finetune.ipynb" target="_parent\"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 ## 📖 Quick Index
 * [🚀 Updates](#-updates)
