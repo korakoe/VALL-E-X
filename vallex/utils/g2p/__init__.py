@@ -1,6 +1,7 @@
 """ from https://github.com/keithito/tacotron """
 import vallex.utils.g2p.cleaners
 from vallex.utils.g2p.symbols import symbols
+from vallex.utils.helpers import with_base_path
 from tokenizers import Tokenizer
 
 # Mappings from symbol to numeric ID and vice versa:
@@ -9,8 +10,8 @@ _id_to_symbol = {i: s for i, s in enumerate(symbols)}
 
 
 class PhonemeBpeTokenizer:
-  def __init__(self, tokenizer_path = "./utils/g2p/bpe_1024.json"):
-    self.tokenizer = Tokenizer.from_file(tokenizer_path)
+  def __init__(self, tokenizer_path = "utils/g2p/bpe_1024.json"):
+    self.tokenizer = Tokenizer.from_file(with_base_path(tokenizer_path))
 
   def tokenize(self, text):
     # 1. convert text to phoneme

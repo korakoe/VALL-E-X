@@ -15,8 +15,9 @@ from vallex.data.collation import get_text_token_collater
 from vallex.utils.g2p import PhonemeBpeTokenizer
 
 from vallex.utils.macros import *
+from vallex.utils.helpers import with_base_path
 
-text_tokenizer = PhonemeBpeTokenizer(tokenizer_path="./utils/g2p/bpe_69.json")
+text_tokenizer = PhonemeBpeTokenizer(tokenizer_path="utils/g2p/bpe_69.json")
 text_collater = get_text_token_collater()
 
 device = torch.device("cpu")
@@ -26,7 +27,7 @@ if torch.backends.mps.is_available():
     device = torch.device("mps")
 codec = AudioTokenizer(device)
 
-if not os.path.exists("./whisper/"): os.mkdir("./whisper/")
+if not os.path.exists(with_base_path("whisper/")): os.mkdir(with_base_path("whisper/"))
 whisper_model = None
 
 @torch.no_grad()
@@ -78,10 +79,10 @@ def make_prompt(name, audio_prompt_path, transcript=None):
 
     message = f"Detected language: {lang_pr}\n Detected text {text_pr}\n"
 
-    os.makedirs("./customs/", exist_ok=True)
+    os.makedirs(with_base_path("customs/"), exist_ok=True)
 
     # save as npz file
-    save_path = os.path.join("./customs/", f"{name}.npz")
+    save_path = os.path.join(with_base_path("customs/"), f"{name}.npz")
     np.savez(save_path, audio_tokens=audio_tokens, text_tokens=text_tokens, lang_code=lang2code[lang_pr])
     logging.info(f"Successful. Prompt saved to {save_path}")
 
@@ -103,11 +104,11 @@ def make_transcript(name, wav, sr, transcript=None):
         if whisper_model is None:
             whisper_model = whisper.load_model("medium", download_root=os.path.join(os.getcwd(), "whisper"))
         whisper_model.to(device)
-        torchaudio.save(f"./prompts/{name}.wav", wav, sr)
-        lang, text = transcribe_one(whisper_model, f"./prompts/{name}.wav")
+        torchaudio.save(with_base_path(f"prompts/{name}.wav"), wav, sr)
+        lang, text = transcribe_one(whisper_model, with_base_path(f"prompts/{name}.wav"))
         lang_token = lang2token[lang]
         text = lang_token + text + lang_token
-        os.remove(f"./prompts/{name}.wav")
+        os.remove(with_base_path(f"prompts/{name}.wav"))
         whisper_model.cpu()
     else:
         text = transcript

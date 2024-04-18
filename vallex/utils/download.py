@@ -3,6 +3,7 @@ import requests
 import os
 from tqdm import tqdm
 import torch
+from vallex.utils.helpers import with_base_path
 
 device = torch.device("cpu")
 if torch.cuda.is_available():
@@ -11,22 +12,22 @@ if torch.backends.mps.is_available():
     device = torch.device("mps")
 url = 'https://huggingface.co/Plachta/VALL-E-X/resolve/main/vallex-checkpoint.pt'
 
-checkpoints_dir = "./checkpoints/"
+checkpoints_dir = with_base_path("checkpoints/")
 
 model_checkpoint_name = "vallex-checkpoint.pt"
 
 
 def download_models_from_github():
-    if not os.path.exists("./checkpoints"):
+    if not os.path.exists(with_base_path("checkpoints")):
         model_url = "https://huggingface.co/Plachta/VALL-E-X/resolve/main/vallex-checkpoint.pt"
         whisper_url = "https://openaipublic.azureedge.net/main/whisper/models/345ae4da62f9b3d59415adc60127b97c714f32e89e936602e85993674d08dcb1/medium.pt"
-        os.makedirs("./whisper", exist_ok=True)
-        os.makedirs("./checkpoints", exist_ok=True)
+        os.makedirs(with_base_path("whisper"), exist_ok=True)
+        os.makedirs(with_base_path("checkpoints"), exist_ok=True)
 
         print("Downloading token list...")
-        os.makedirs("./utils/g2p", exist_ok=True)
-        r = requests.get("https://raw.githubusercontent.com/korakoe/VALL-E-X/master/utils/g2p/bpe_69.json", stream=True)
-        path = "./utils/g2p/bpe_69.json"
+        os.makedirs(with_base_path("utils/g2p"), exist_ok=True)
+        r = requests.get("https://raw.githubusercontent.com/dwash96/VALL-E-X/main/utils/g2p/bpe_69.json", stream=True)
+        path = with_base_path("utils/g2p/bpe_69.json")
         with open(path, 'wb') as f:
             total_length = int(r.headers.get('content-length'))
             for chunk in tqdm(r.iter_content(chunk_size=1024), total=(total_length / 1024) + 1):
@@ -36,7 +37,7 @@ def download_models_from_github():
 
         print("Downloading whisper...")
         r = requests.get(whisper_url, stream=True)
-        path = './whisper/medium.pt'
+        path = with_base_path('whisper/medium.pt')
         with open(path, 'wb') as f:
             total_length = int(r.headers.get('content-length'))
             for chunk in tqdm(r.iter_content(chunk_size=1024), total=(total_length / 1024) + 1):
@@ -46,7 +47,7 @@ def download_models_from_github():
 
         print("Downloading VALL-E-X...")
         r = requests.get(model_url, stream=True)
-        path = './checkpoints/vallex-checkpoint.pt'
+        path = with_base_path('checkpoints/vallex-checkpoint.pt')
         with open(path, 'wb') as f:
             total_length = int(r.headers.get('content-length'))
             for chunk in tqdm(r.iter_content(chunk_size=1024), total=(total_length / 1024) + 1):

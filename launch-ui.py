@@ -38,6 +38,7 @@ from vallex.data import (
 from vallex.data import get_text_token_collater
 from vallex.models.vallex import VALLE
 from vallex.utils.g2p import PhonemeBpeTokenizer
+from vallex.utils.helpers import with_base_path
 from descriptions import *
 from macros import *
 from examples import *
@@ -73,7 +74,7 @@ if not os.path.exists(os.path.join("vallex/checkpoints/", "vallex-checkpoint.pt"
         logging.info("Downloading model from https://huggingface.co/Plachta/VALL-E-X/resolve/main/vallex-checkpoint.pt ...")
         # download from https://huggingface.co/Plachta/VALL-E-X/resolve/main/vallex-checkpoint.pt to ./checkpoints/vallex-checkpoint.pt
         wget.download("https://huggingface.co/Plachta/VALL-E-X/resolve/main/vallex-checkpoint.pt",
-                      out="./checkpoints/vallex-checkpoint.pt", bar=wget.bar_adaptive)
+                      out=with_base_path("checkpoints/vallex-checkpoint.pt"), bar=wget.bar_adaptive)
     except Exception as e:
         logging.info(e)
         raise Exception(
@@ -210,7 +211,7 @@ def make_prompt(name, wav, sr, save=True):
     if wav.ndim == 1:
         wav = wav.unsqueeze(0)
     assert wav.ndim and wav.size(0) == 1
-    torchaudio.save(f"./prompts/{name}.wav", wav, sr)
+    torchaudio.save(with_base_path(f"prompts/{name}.wav"), wav, sr)
     lang, text = transcribe_one(whisper_model, f"vallex/prompts/{name}.wav")
     lang_token = lang2token[lang]
     text = lang_token + text + lang_token

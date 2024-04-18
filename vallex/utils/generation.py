@@ -31,6 +31,7 @@ from vallex.utils.g2p import PhonemeBpeTokenizer
 from vallex.utils.sentence_cutter import split_text_into_sentences
 
 from vallex.utils.macros import *
+from vallex.utils.helpers import with_base_path
 
 device = torch.device("cpu")
 if torch.cuda.is_available():
@@ -39,7 +40,7 @@ if torch.backends.mps.is_available():
     device = torch.device("mps")
 url = 'https://huggingface.co/Plachta/VALL-E-X/resolve/main/vallex-checkpoint.pt'
 
-checkpoints_dir = "./checkpoints/"
+checkpoints_dir = with_base_path("checkpoints/")
 
 model_checkpoint_name = "vallex-checkpoint.pt"
 
@@ -49,10 +50,10 @@ codec = None
 
 vocos = None
 
-if not os.path.exists("./utils/g2p/bpe_69.json"):
-    os.makedirs("./utils/g2p", exist_ok=True)
-    r = requests.get("https://raw.githubusercontent.com/korakoe/VALL-E-X/master/utils/g2p/bpe_69.json", stream=True)
-    path = "./utils/g2p/bpe_69.json"
+if not os.path.exists(with_base_path("utils/g2p/bpe_69.json")):
+    os.makedirs(with_base_path("utils/g2p"), exist_ok=True)
+    r = requests.get("https://raw.githubusercontent.com/dwash96/VALL-E-X/main/utils/g2p/bpe_69.json", stream=True)
+    path = with_base_path("utils/g2p/bpe_69.json")
     with open(path, 'wb') as f:
         total_length = int(r.headers.get('content-length'))
         for chunk in tqdm(r.iter_content(chunk_size=1024), total=(total_length / 1024) + 1):
@@ -60,7 +61,7 @@ if not os.path.exists("./utils/g2p/bpe_69.json"):
                 f.write(chunk)
                 f.flush()
 
-text_tokenizer = PhonemeBpeTokenizer(tokenizer_path="./utils/g2p/bpe_69.json")
+text_tokenizer = PhonemeBpeTokenizer(tokenizer_path="utils/g2p/bpe_69.json")
 text_collater = get_text_token_collater()
 
 
@@ -119,9 +120,9 @@ def generate_audio(model, codec, vocos, text, prompt=None, language='auto', acce
     if prompt is not None:
         prompt_path = prompt
         if not os.path.exists(prompt_path):
-            prompt_path = "./presets/" + prompt + ".npz"
+            prompt_path = with_base_path("presets/") + prompt + ".npz"
         if not os.path.exists(prompt_path):
-            prompt_path = "./customs/" + prompt + ".npz"
+            prompt_path = with_base_path("customs/") + prompt + ".npz"
         if not os.path.exists(prompt_path):
             raise ValueError(f"Cannot find prompt {prompt}")
         prompt_data = np.load(prompt_path)
@@ -187,9 +188,9 @@ def generate_audio_from_long_text(text, prompt=None, language='auto', accent='no
     if prompt is not None and prompt != "":
         prompt_path = prompt
         if not os.path.exists(prompt_path):
-            prompt_path = "./presets/" + prompt + ".npz"
+            prompt_path = with_base_path("presets/") + prompt + ".npz"
         if not os.path.exists(prompt_path):
-            prompt_path = "./customs/" + prompt + ".npz"
+            prompt_path = with_base_path("customs/") + prompt + ".npz"
         if not os.path.exists(prompt_path):
             raise ValueError(f"Cannot find prompt {prompt}")
         prompt_data = np.load(prompt_path)
